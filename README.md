@@ -1,4 +1,4 @@
-# AI Tool-Calling Agent (from scratch)
+# AI Tool-Calling Agent
 
 A small, readable AI assistant that **decides for itself** when to call tools, runs them in
 Python, feeds the results back to the LLM, and repeats until it can answer. Built on the
