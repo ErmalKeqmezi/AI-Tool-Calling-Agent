@@ -5,6 +5,66 @@ Python, feeds the results back to the LLM, and repeats until it can answer. Buil
 Anthropic Messages API with its native tool calling. No agent frameworks, no RAG, no
 embeddings, no vector databases. The loop is written by hand so you can see every step.
 
+## How to use it
+
+### 1. Set up (once)
+
+You need Python 3.10+ and an Anthropic API key (get one at https://console.anthropic.com).
+
+```bash
+git clone https://github.com/ErmalKeqmezi/AI-Tool-Calling-Agent.git
+cd AI-Tool-Calling-Agent
+python -m venv .venv
+.venv\Scripts\activate            # Windows
+# source .venv/bin/activate       # macOS / Linux
+pip install -r requirements.txt
+copy .env.example .env            # macOS / Linux: cp .env.example .env
+```
+
+Open `.env` and set your key:
+
+```
+ANTHROPIC_API_KEY=sk-ant-...
+```
+
+### 2. Start the app
+
+```bash
+streamlit run app.py
+```
+
+Your browser opens at http://localhost:8501. If the sidebar shows **● Online**, the agent is ready.
+
+### 3. Chat with the agent
+
+- Type a question in the box at the bottom and press **Enter**, or click one of the example prompts.
+- The agent decides on its own whether it needs a tool. While it works, you'll see *🤔 Agent is thinking…* or *🔧 Using Calculator…*.
+- Every tool the agent used appears above its answer as a collapsible block (`✓ calculate · expression: 25 * 17 · Completed`). Click it to see the exact arguments and the result.
+- Ask follow-up questions naturally. The agent remembers the conversation ("What's the weather in Berlin?" → "And tomorrow?").
+- Actions that change something, like creating or deleting a file, are **never run automatically**. The agent shows what it wants to do and waits for you to click **✅ Approve** or **❌ Deny**. Files are only written inside the `workspace/` folder.
+- **Clear conversation** in the sidebar starts a fresh chat and wipes the agent's memory.
+
+Things to try:
+
+| Ask | Tools it will use |
+|---|---|
+| What is 25 × 17? | `calculate` |
+| What time is it in Tokyo? | `get_current_time` |
+| What's the weather in Berlin? Then: "What about tomorrow?" | `get_weather` (twice, using memory) |
+| What is 25 × 17 and what time is it in Tokyo? | `calculate` + `get_current_time` |
+| Search the web for the latest Python release. | `search_web` |
+| Create a file called notes.txt with a haiku about Python. | `create_file` (asks for approval) |
+
+### Other ways to run it
+
+| Interface | Command |
+|---|---|
+| Terminal chat | `python -m app.main` (add `-v` to see every tool call in the logs, `/reset` clears memory, `/quit` exits) |
+| HTTP API | `uvicorn app.api.server:create_app --factory --reload`, then `POST /chat` (see [API](#api)) |
+| Tests (no API key needed) | `pytest` |
+
+Optional: set `TAVILY_API_KEY` in `.env` for full web search results (a free key is available at https://tavily.com). Without it, search falls back to DuckDuckGo instant answers.
+
 ## 1. What it does
 
 ```
@@ -397,3 +457,12 @@ All settings come from environment variables (see `.env.example`):
 | `AGENT_MAX_HISTORY_TURNS` | `20` | Short-term memory size |
 | `TAVILY_API_KEY` | — | Optional, for full web search |
 | `FILE_SANDBOX_DIR` | `./workspace` | Where the file tools may write |
+
+## Author
+
+**Ermal Keqmezi**  
+Software Developer & AI Engineer
+
+## License
+
+This project is available for educational and portfolio purposes.
